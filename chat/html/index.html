@@ -128,7 +128,8 @@
             this.users = msg
         })
         socket.on ('loadMessage', msg => {
-            console.log(loadMessage)
+            this.chatHistory = msg
+            console.log(msg)
         })
       },
       data(){
