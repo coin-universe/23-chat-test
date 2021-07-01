@@ -4,9 +4,25 @@
   "description": "test chat app",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js"
+    "client": "ts-node client.ts"
   },
   "repository": "coin-universe/23-chat-test",
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "cli-color": "^1.4.0",
+    "express": "4",
+    "notepack.io": "^2.2.0",
+    "redis": "^2.8.0",
+    "socket.io": "^2.2.0",
+    "ts-node": "^10.0.0",
+    "typescript": "^4.3.5"
+  },
+  "devDependencies": {
+    "@types/node": "^10.12.19",
+    "@types/redis": "^2.8.10",
+    "@types/socket.io": "^2.1.2",
+    "@types/socket.io-client": "^1.4.32",
+    "socket.io-client": "^2.2.0"
+  }
 }

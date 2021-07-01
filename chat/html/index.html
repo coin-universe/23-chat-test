@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+  <style>
+      .container, .col, .row {
+        height:100%;
+      }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <v-app>
+      <v-main>
+        <v-container v-if="user === null">
+            <v-card style="margin-top: 10px; height: 87px;">
+                <v-card-text>                
+                    <v-text-field
+                    v-model="username"
+                    v-on:keyup.enter="enter"
+                    outlined
+                    clearable
+                    label="Имя пользователя"
+                    placeholder="Введите имя пользователя"
+                    type="text"
+                    >
+                    <template v-slot:append-outer>
+                        <v-btn
+                        large
+                        dark
+                        color="primary"
+                        @click="enter"
+                        style="margin-top: -12px;"
+                        >Войти</v-btn>
+                    </template>
+                    </v-text-field>
+                </v-card-text>
+            </v-card>
+
+        </v-container>
+        <v-row no-gutters v-if="user !== null">
+            <v-col sm="9">                
+              <v-container style="padding-bottom: 108px;overflow: hidden;">                    
+                <v-card height="100%">
+                  <v-card-text style="overflow: auto;height: 100%;position: absolute;" id="x">
+                    <div v-for="x in chatHistory">
+
+                        <v-card v-if="user === x.u" style="margin-bottom: 10px;margin-right: 4em;" outlined color="#cbf8cb">
+                            <v-card-text>
+                                <b>{{x.u}}:</b> {{x.m}}
+                            </v-card-text>
+                        </v-card>
+
+                        <v-card v-if="user !== x.u" style="margin-bottom: 10px;margin-left: 4em;" outlined :color="x.Personalize ? '#c2e8f3' : '#f6fcff'">
+                            <v-card-text>
+                                <b><a @click="toUser(x.u)">{{x.u}}</a>:</b> {{x.m}}
+                            </v-card-text>
+                        </v-card>
+
+                    </div>
+                  </v-card-text>
+                </v-card>
+                <v-card style="margin-top: 10px; height: 87px;">
+                  <v-card-text>                    
+                              <v-text-field
+                                v-model="message"
+                                v-on:keyup.enter="submit"
+                                outlined
+                                clearable
+                                label="Сообщение"
+                                placeholder="Введите текст сообщения"
+                                type="text"
+                              >
+                                <template v-slot:append-outer>
+                                  <v-btn
+                                    large
+                                    dark
+                                    color="primary"
+                                    @click="submit"
+                                    style="margin-top: -12px;"
+                                  >Отправить</v-btn>
+                                </template>
+                              </v-text-field>
+                  </v-card-text>
+                </v-card>
+              </v-container>
+            </v-col>
+            <v-col sm="3">              
+              <v-container> 
+                <v-card height="100%">
+                  <v-card-title>Пользователи онлайн</v-card-title>
+                  <v-card-text>
+                      <div v-for="user in users">
+                        <v-btn text @click="toUser(user)" style="text-transform: none;">{{user}}</v-btn>
+                      </div>
+                  </v-card-text>
+                </v-card>            
+              </v-container> 
+            </v-col>
+        </v-row>
+      </v-main>
+    </v-app>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    new Vue({
+      el: '#app',
+      vuetify: new Vuetify(),
+      created() {
+        socket.on ('chat message', msg => {
+            if (this.isPersonalize(msg)) {
+                msg.Personalize = true
+                alert('Вас упомянули в сообщении')
+            } else {
+                msg.Personalize = false
+            }
+            this.chatHistory.push(msg)
+            this.scroll()
+        })
+        socket.on ('users', msg => {
+            this.users = msg
+        })
+        socket.on ('loadMessage', msg => {
+            console.log(loadMessage)
+        })
+      },
+      data(){
+        return {
+          message: "",
+          username: "",
+          user: null,
+          chatHistory: [],
+          users: []
+        }
+      },
+      watch: {
+        username: function (val) {
+            this.username = val.replace(/\s/g, '');
+        }
+      },
+      methods: {
+        isPersonalize(msg) {
+            return msg.m.includes(`@${this.user}`)
+        },
+        toUser(user) {
+            this.message = `${this.message} @${user} `
+        },
+        enter() {
+            if (this.username != "") {
+                this.user = this.username.replace(/\s/g, '');
+                
+                // EMIT
+                socket.emit('login', this.username);
+
+            } else {
+                alert("имя пользователя не может быть пустым")
+            }
+        },
+        scroll() {           
+            let container = this.$el.querySelector("#x")
+            container.scrollTop = container.scrollHeight;
+        },
+        submit() {
+          if (this.message != null && this.message != "") {
+            // EMIT
+            socket.emit('chat message', {
+                m:this.message,
+                u:this.user
+            })
+            this.message = ""
+          } else {
+            alert('сообщение пустое')
+          }
+        }
+      }
+    })
+  </script>
+</body>
+</html>
