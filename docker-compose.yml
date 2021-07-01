@@ -1,0 +1,8 @@
+version: '3.2'
+services:
+  chat:
+    build: chat
+    links:
+      - redis
+  redis:
+    image: redis
