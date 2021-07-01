@@ -128,8 +128,7 @@
             this.users = msg
         })
         socket.on ('loadMessage', msg => {
-            this.chatHistory = msg
-            console.log(msg)
+            this.chatHistory = msg.reverse()
         })
       },
       data(){
