@@ -88,10 +88,12 @@
                 </v-card>
               </v-container>
             </v-col>
-            <v-col md="3" sm="12">              
+            <v-col md="3" sm="12" v-if="munu_users">              
               <v-container> 
                 <v-card height="100%">
-                  <v-card-title>Пользователи онлайн</v-card-title>
+                  <v-card-title>Пользователи онлайн 
+                      <v-btn text @click="munu_users = false" x-small>hide</v-btn>
+                  </v-card-title>
                   <v-card-text>
                       <div v-for="user in users">
                         <v-btn text @click="toUser(user)" style="text-transform: none;">{{user}}</v-btn>
@@ -141,7 +143,8 @@
           username: "",
           user: null,
           chatHistory: [],
-          users: []
+          users: [],
+          munu_users: true
         }
       },
       watch: {
