@@ -4,7 +4,7 @@
   "description": "test chat app",
   "main": "app.js",
   "scripts": {
-    "client": "ts-node client.ts"
+    "start": "ts-node client.ts"
   },
   "repository": "coin-universe/23-chat-test",
   "author": "",
